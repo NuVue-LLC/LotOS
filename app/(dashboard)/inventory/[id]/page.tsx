@@ -13,8 +13,6 @@ import { Skeleton } from '@/components/ui/skeleton'
 import type { InventoryItem, InventoryStatus } from '@/types/database'
 import { ArrowLeft, Sparkles, Trash2, ChevronLeft, ChevronRight, ImagePlus, X } from 'lucide-react'
 
-const mono = 'ui-monospace, SFMono-Regular, "SF Mono", Menlo, monospace'
-
 const cardStyle = {
   background: '#fff',
   border: '1px solid #e8ebe6',
@@ -74,7 +72,6 @@ export default function VehicleDetailPage() {
     model: '',
     trim: '',
     price: '',
-    cost_basis: '',
     mileage: '',
     status: 'available' as InventoryStatus,
     color: '',
@@ -113,7 +110,6 @@ export default function VehicleDetailPage() {
       model: data.model ?? '',
       trim: data.trim ?? '',
       price: data.price?.toString() ?? '',
-      cost_basis: data.purchase_price?.toString() ?? '',
       mileage: data.mileage?.toString() ?? '',
       status: data.status,
       color: data.color ?? '',
@@ -139,7 +135,6 @@ export default function VehicleDetailPage() {
           model: form.model || null,
           trim: form.trim || null,
           price: form.price ? parseFloat(form.price) : null,
-          purchase_price: form.cost_basis ? parseFloat(form.cost_basis) : null,
           mileage: form.mileage ? parseInt(form.mileage) : null,
           status: form.status,
           color: form.color || null,
@@ -279,12 +274,6 @@ export default function VehicleDetailPage() {
   if (loading) return <LoadingSkeleton />
 
   const photos = vehicle?.photos ?? []
-  const profit = form.price && form.cost_basis
-    ? parseFloat(form.price) - parseFloat(form.cost_basis)
-    : null
-  const margin = profit != null && form.price && parseFloat(form.price) > 0
-    ? (profit / parseFloat(form.price)) * 100
-    : null
 
   const vehicleName = vehicle
     ? `${vehicle.year ?? ''} ${vehicle.make ?? ''} ${vehicle.model ?? ''}`.trim() || 'Vehicle Details'
@@ -393,16 +382,8 @@ export default function VehicleDetailPage() {
             <h2 style={sectionTitle}>Pricing & Mileage</h2>
             <div className="grid grid-cols-2" style={{ gap: 10 }}>
               <Input label="Price" className="h-[34px]" type="number" value={form.price} onChange={(e) => setForm((f) => ({ ...f, price: e.target.value }))} placeholder="15000" />
-              <Input label="Cost Basis" className="h-[34px]" type="number" value={form.cost_basis} onChange={(e) => setForm((f) => ({ ...f, cost_basis: e.target.value }))} placeholder="12000" />
               <Input label="Mileage" className="h-[34px]" type="number" value={form.mileage} onChange={(e) => setForm((f) => ({ ...f, mileage: e.target.value }))} placeholder="45000" />
             </div>
-            {profit != null && margin != null && (
-              <div style={{ marginTop: 8, fontSize: 12, color: '#999', fontFamily: mono }}>
-                Profit: <span style={{ fontWeight: 600, color: profit >= 0 ? '#2d7a4f' : '#dc3545' }}>${profit.toLocaleString()}</span>
-                {' · '}
-                Margin: <span style={{ fontWeight: 600, color: margin >= 20 ? '#2d7a4f' : margin >= 10 ? '#E67E22' : '#dc3545' }}>{margin.toFixed(1)}%</span>
-              </div>
-            )}
           </Card>
 
           {/* Status */}

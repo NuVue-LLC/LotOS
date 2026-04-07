@@ -35,7 +35,7 @@ export default function AddVehiclePage() {
   const [scanError, setScanError] = useState<string | null>(null)
   const [form, setForm] = useState({
     vin: '', year: '', make: '', model: '', trim: '',
-    mileage: '', price: '', cost_basis: '', color: '', description: '', notes: '',
+    mileage: '', price: '', color: '', description: '', notes: '',
   })
 
   async function lookupVin() {
@@ -80,7 +80,7 @@ export default function AddVehiclePage() {
       setForm((f) => ({
         ...f, vin: data.vin ?? f.vin, year: data.year?.toString() ?? f.year,
         make: data.make ?? f.make, model: data.model ?? f.model,
-        mileage: data.mileage?.toString() ?? f.mileage, cost_basis: data.purchase_price?.toString() ?? f.cost_basis,
+        mileage: data.mileage?.toString() ?? f.mileage,
       }))
     } catch { setScanError('Could not read buy sheet') }
     finally { setScanning(false) }
@@ -155,7 +155,6 @@ export default function AddVehiclePage() {
         mileage: form.mileage ? parseInt(form.mileage) : null,
         price: form.price ? parseFloat(form.price) : null,
         color: form.color || null, description: description || null,
-        purchase_price: form.cost_basis ? parseFloat(form.cost_basis) : null,
         notes: form.notes || null, photos: photoUrls, status: 'available' as const,
       })
       if (insertError) { setError(insertError.message); setSaving(false); return }
@@ -235,10 +234,8 @@ export default function AddVehiclePage() {
             <h2 style={{ fontSize: 15, fontWeight: 600, color: '#1a1a1a', marginBottom: 12 }}>Pricing & Mileage</h2>
             <div className="grid grid-cols-2" style={{ gap: 12 }}>
               <Input label="Price" type="number" value={form.price} onChange={(e) => setForm((f) => ({ ...f, price: e.target.value }))} placeholder="15000" />
-              <Input label="Cost Basis" type="number" value={form.cost_basis} onChange={(e) => setForm((f) => ({ ...f, cost_basis: e.target.value }))} placeholder="12000" />
               <Input label="Mileage" type="number" value={form.mileage} onChange={(e) => setForm((f) => ({ ...f, mileage: e.target.value }))} placeholder="45000" />
             </div>
-            <p style={{ fontSize: 12, color: '#aaa', marginTop: 6 }}>Cost basis is private — never shown to customers</p>
           </div>
 
           <div>
