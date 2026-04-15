@@ -15,7 +15,6 @@ export default function SignupPage() {
     dealershipName: '',
     email: '',
     phone: '',
-    address: '',
     websiteUrl: '',
     password: '',
   })
@@ -41,7 +40,6 @@ export default function SignupPage() {
           name: form.dealershipName,
           full_name: form.name,
           phone: form.phone,
-          address: form.address,
           website_url: form.websiteUrl ? normalizeDomain(form.websiteUrl) : undefined,
         },
       },
@@ -98,13 +96,6 @@ export default function SignupPage() {
         value={form.phone}
         onChange={update('phone')}
         placeholder="(555) 123-4567"
-      />
-
-      <Input
-        label="Address"
-        value={form.address}
-        onChange={update('address')}
-        placeholder="123 Main St, City, ST 12345"
       />
 
       <Input
