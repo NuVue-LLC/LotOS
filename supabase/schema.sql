@@ -57,6 +57,8 @@ create table inventory (
   description text,
   recon_cost numeric(10, 2) default 0,
   purchase_price numeric(10, 2) default 0,
+  purchase_payment_method text,
+  on_lot boolean not null default true,
   notes text,
   listed_at timestamptz default now(),
   created_at timestamptz default now(),

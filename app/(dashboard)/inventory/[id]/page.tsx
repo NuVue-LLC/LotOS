@@ -8,6 +8,7 @@ import { createClient } from '@/lib/supabase/client'
 import { Card } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { Select } from '@/components/ui/select'
 import { Modal } from '@/components/ui/modal'
 import { Skeleton } from '@/components/ui/skeleton'
 import type { InventoryItem, InventoryStatus } from '@/types/database'
@@ -72,12 +73,32 @@ export default function VehicleDetailPage() {
     model: '',
     trim: '',
     price: '',
+    purchase_price: '',
+    recon_cost: '',
+    purchase_payment_method: '',
+    on_lot: true,
     mileage: '',
     status: 'available' as InventoryStatus,
     color: '',
     description: '',
     notes: '',
   })
+
+  const margin =
+    form.price !== '' && (form.purchase_price !== '' || form.recon_cost !== '')
+      ? (parseFloat(form.price || '0') || 0) -
+        (parseFloat(form.purchase_price || '0') || 0) -
+        (parseFloat(form.recon_cost || '0') || 0)
+      : null
+
+  const paymentMethodOptions = [
+    { value: '', label: 'Select payment method...' },
+    { value: 'cash', label: 'Cash' },
+    { value: 'card', label: 'Card' },
+    { value: 'check', label: 'Check' },
+    { value: 'cashier_check', label: "Cashier's Check" },
+    { value: 'cashapp', label: 'CashApp' },
+  ]
 
   useEffect(() => {
     loadVehicle()
@@ -110,6 +131,10 @@ export default function VehicleDetailPage() {
       model: data.model ?? '',
       trim: data.trim ?? '',
       price: data.price?.toString() ?? '',
+      purchase_price: data.purchase_price?.toString() ?? '',
+      recon_cost: data.recon_cost?.toString() ?? '',
+      purchase_payment_method: data.purchase_payment_method ?? '',
+      on_lot: data.on_lot ?? true,
       mileage: data.mileage?.toString() ?? '',
       status: data.status,
       color: data.color ?? '',
@@ -135,6 +160,10 @@ export default function VehicleDetailPage() {
           model: form.model || null,
           trim: form.trim || null,
           price: form.price ? parseFloat(form.price) : null,
+          purchase_price: form.purchase_price ? parseFloat(form.purchase_price) : 0,
+          recon_cost: form.recon_cost ? parseFloat(form.recon_cost) : 0,
+          purchase_payment_method: form.purchase_payment_method || null,
+          on_lot: form.on_lot,
           mileage: form.mileage ? parseInt(form.mileage) : null,
           status: form.status,
           color: form.color || null,
@@ -383,9 +412,29 @@ export default function VehicleDetailPage() {
           <Card style={cardStyle}>
             <h2 style={sectionTitle}>Pricing & Mileage</h2>
             <div className="grid grid-cols-2" style={{ gap: 10 }}>
+              <Input label="Purchase Price" type="number" value={form.purchase_price} onChange={(e) => setForm((f) => ({ ...f, purchase_price: e.target.value }))} placeholder="What you paid" />
+              <Select label="Payment Method" value={form.purchase_payment_method} onChange={(e) => setForm((f) => ({ ...f, purchase_payment_method: e.target.value }))} options={paymentMethodOptions} />
+              <Input label="Recon / Repairs" type="number" value={form.recon_cost} onChange={(e) => setForm((f) => ({ ...f, recon_cost: e.target.value }))} placeholder="Money into the car" />
               <Input label="Price" type="number" value={form.price} onChange={(e) => setForm((f) => ({ ...f, price: e.target.value }))} placeholder="15000" />
               <Input label="Mileage" type="number" value={form.mileage} onChange={(e) => setForm((f) => ({ ...f, mileage: e.target.value }))} placeholder="45000" />
             </div>
+            {margin !== null && (
+              <div style={{
+                marginTop: 10,
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                padding: '8px 12px',
+                borderRadius: 6,
+                border: '1px solid #e8ebe6',
+                backgroundColor: '#f9faf8',
+              }}>
+                <span style={{ fontSize: 12, fontWeight: 500, color: '#666' }}>Estimated Margin</span>
+                <span style={{ fontSize: 14, fontWeight: 600, color: margin >= 0 ? '#2d7a4f' : '#dc3545' }}>
+                  {margin < 0 ? '-' : ''}${Math.abs(margin).toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 2 })}
+                </span>
+              </div>
+            )}
           </Card>
 
           {/* Status */}
@@ -452,6 +501,40 @@ export default function VehicleDetailPage() {
                 </button>
               ))}
             </div>
+          </Card>
+
+          {/* Location */}
+          <Card style={cardStyle}>
+            <h2 style={sectionTitle}>Location</h2>
+            <div style={{ display: 'flex', gap: 8 }}>
+              <button
+                type="button"
+                onClick={() => setForm((f) => ({ ...f, on_lot: true }))}
+                style={{
+                  flex: 1, padding: '8px 0', borderRadius: 6,
+                  border: form.on_lot ? '1px solid #2d7a4f' : '1px solid #e8ebe6',
+                  background: form.on_lot ? '#2d7a4f' : '#fff',
+                  color: form.on_lot ? '#fff' : '#1a1a1a',
+                  fontSize: 13, fontWeight: 600, cursor: 'pointer',
+                }}
+              >
+                On Lot
+              </button>
+              <button
+                type="button"
+                onClick={() => setForm((f) => ({ ...f, on_lot: false }))}
+                style={{
+                  flex: 1, padding: '8px 0', borderRadius: 6,
+                  border: !form.on_lot ? '1px solid #b8860b' : '1px solid #e8ebe6',
+                  background: !form.on_lot ? '#b8860b' : '#fff',
+                  color: !form.on_lot ? '#fff' : '#1a1a1a',
+                  fontSize: 13, fontWeight: 600, cursor: 'pointer',
+                }}
+              >
+                Off Lot
+              </button>
+            </div>
+            <p style={{ fontSize: 12, color: '#999', marginTop: 6 }}>Off Lot = at the mechanic, in transit, or not on site.</p>
           </Card>
         </div>
 

@@ -37,6 +37,8 @@ export interface InventoryItem {
   description: string | null
   recon_cost: number | null
   purchase_price: number | null
+  purchase_payment_method: string | null
+  on_lot: boolean
   notes: string | null
   listed_at: string
   created_at: string
