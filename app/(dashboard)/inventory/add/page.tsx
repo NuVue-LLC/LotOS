@@ -177,7 +177,8 @@ export default function AddVehiclePage() {
         price: form.price ? parseFloat(form.price) : null,
         purchase_price: form.purchase_price ? parseFloat(form.purchase_price) : 0,
         recon_cost: form.recon_cost ? parseFloat(form.recon_cost) : 0,
-        // purchase_payment_method and on_lot omitted until migration runs
+        purchase_payment_method: form.purchase_payment_method || null,
+        on_lot: onLot,
         color: form.color || null, description: description || null,
         notes: form.notes || null, photos: photoUrls, status: 'available' as const,
       })
